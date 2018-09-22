@@ -101,16 +101,16 @@ function handleSubmitButton() {
 	let userText = $("#userTextField").val();
 
 	let context = canvas.getContext("2d");
-
 	context.fillStyle = "white";
 	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	let textDiv = document.getElementById("text-area");
+	textDiv.innerHTML = `<p></p>`;
+
 	lines = [];
 	words = [];
 
 	if (userText && userText != "") {
-		let textDiv = document.getElementById("text-area");
-		textDiv.innerHTML = `<p></p>`;
-
 		let userRequestObj = { text: userText };
 		let userRequestJSON = JSON.stringify(userRequestObj);
 		$("#userTextField").val("");
@@ -122,10 +122,28 @@ function handleSubmitButton() {
 			let responseObj = data;
 			lines = responseObj.lyricsArray;
 
+			let yValue = 30;
+
 			for (line of lines) {
 				if (line.length === 0) continue;
 
+				let xValue = 20;
+
 				textDiv.innerHTML = textDiv.innerHTML + `<p>${line}</p>`;
+
+				line = line.split("[").join(" [");
+				line = line.split("]").join("] ");
+
+				let wordsInLine = line.split(/\s/);
+
+				console.log(wordsInLine);
+
+				for (aWord of wordsInLine) {
+					words.push({ word: aWord, x:xValue, y:yValue });
+					xValue += 9 + context.measureText(aWord).width;
+				}
+
+				yValue += 50;
 			}
 
 			drawCanvas();
