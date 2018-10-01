@@ -42,10 +42,16 @@ let drawCanvas = function() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	context.font = "15pt Arial";
-	context.fillStyle = "blue";
 
 	for (let i = 0; i < words.length; i++) {
 		let data = words[i];
+
+		if (data.word.indexOf("[") > -1) {
+			context.fillStyle = "green";
+		} else {
+			context.fillStyle = "blue";
+		}
+
 		context.fillText(data.word, data.x, data.y);
 	}
 }
