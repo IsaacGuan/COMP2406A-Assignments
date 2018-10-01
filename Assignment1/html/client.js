@@ -1,6 +1,21 @@
 let lines = [];
 let words = [];
 
+let chordTable = {
+	0: "A",
+	1: "A#",
+	2: "B",
+	3: "C",
+	4: "C#",
+	5: "D",
+	6: "D#", 
+	7: "E",
+	8: "F",
+	9: "F#",
+	10: "G",
+	11: "G#"
+}
+
 let wordBeingMoved;
 
 let deltaX, deltaY;
@@ -97,6 +112,41 @@ function handleKeyUp(e) {
 	e.preventDefault();
 }
 
+function transpose(semitones) {
+	for (let i = 0; i < words.length; i++) {
+		if (words[i].word.indexOf("[") > -1) {
+			let chordValue = words[i].word.substring(words[i].word.indexOf("[") + 1 ,words[i].word.indexOf("]"));
+
+			let chord1 = "";
+			let chord2 = "";
+			if (chordValue.indexOf("#") > -1) {
+				chord1 = chordValue.substring(0, chordValue.indexOf("#") + 1);
+				chord2 = chordValue.substring(chordValue.indexOf("#") + 1, chordValue.length);
+			} else {
+				chord1 = chordValue.substring(0, 1);
+				chord2 = chordValue.substring(1, chordValue.length);
+			}
+
+			let chordIndex = Object.keys(chordTable).find(key => chordTable[key] === chord1);
+			console.log("index1: ", chordIndex);
+
+			console.log("semitones: ", semitones);
+
+			chordIndex = (Number(chordIndex) + Number(semitones)) % 12;
+			chord1 = chordTable[chordIndex];
+
+			chordValue = chord1 + chord2;
+
+			console.log("index2: ", chordIndex);
+			console.log("value: ", chordValue);
+
+			let chord = "[" + chordValue + "]";
+
+			words[i].word = chord;
+		}
+	}
+}
+
 function handleSubmitButton() {
 	let userText = $("#userTextField").val();
 
@@ -151,6 +201,16 @@ function handleSubmitButton() {
 			console.log(status);
 		});
 	}
+}
+
+function handleTransposeUpButton() {
+	transpose(1);
+	drawCanvas();
+}
+
+function handleTransposeDownButton() {
+	transpose(11);
+	drawCanvas();
 }
 
 $(document).ready(function() {
