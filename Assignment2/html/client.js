@@ -116,25 +116,67 @@ function parseChordProFormat(chordProLinesArray) {
 		chordProLinesArray[i] = chordProLinesArray[i].replace(/(\r\n|\n|\r)/gm, "");
 	}
 
+	let chordLine = "";
+	let lyricLine = "";
+
 	let textDiv = document.getElementById("text-area");
 	textDiv.innerHTML = "";
 
 	for (let i = 0; i < chordProLinesArray.length; i++) {
 		let line = chordProLinesArray[i];
 		textDiv.innerHTML = textDiv.innerHTML + `<p>${line}</p>`;
-
-		let lyricLine = "";
+		let isReadingChord = false;
+		chordLine = "";
+		lyricLine = "";
+		let chordLength = 0;
 
 		for (let charIndex = 0; charIndex < line.length; charIndex++) {
 			let ch = line.charAt(charIndex);
-			if (ch == "]") {
-				lyricLine = lyricLine + ch + " ";
-			} else if (ch == "[") {
-				lyricLine = lyricLine + " " + ch;
-			} else lyricLine = lyricLine + ch;
+			if (ch === "[") {
+				isReadingChord = true;
+				chordLength = 0;
+				if (chordLine.length > 0 && !chordLine.endsWith(" ")) chordLine = chordLine + " ";
+			}
+			if (ch === "]") {
+				isReadingChord = false;
+			}
+			if (!isReadingChord && ch != "]") {
+				lyricLine = lyricLine + ch;
+				if (chordLength > 0) chordLength--;
+				else chordLine = chordLine + " ";
+			}
+			if (isReadingChord && ch != "[") {
+				chordLine = chordLine + ch;
+				chordLength++;
+			}
 		}
 
 		let characterWidth = canvas.getContext("2d").measureText("m").width;
+
+		chordLine += " ";
+		if (chordLine.trim().length > 0) {
+			let theChordSymbol = "";
+			let theChordLocationIndex = -1;
+			for (let j = 0; j < chordLine.length; j++) {
+				let ch = chordLine.charAt(j);
+				if (ch == " ") {
+					if (theChordSymbol.trim().length > 0) {
+						let word = {
+							word: theChordSymbol,
+							x: 40 + theChordLocationIndex * characterWidth,
+							y: 40 + i * 2 * 40,
+							chord: "chord"
+						};
+						words.push(word);
+					}
+					theChordSymbol = "";
+					theChordLocationIndex = -1;
+				} else {
+					theChordSymbol += ch;
+					if (theChordLocationIndex === -1) theChordLocationIndex = j;
+				}
+			}
+		}
 
 		lyricLine += " ";
 		if (lyricLine.trim().length > 0) {
@@ -147,10 +189,9 @@ function parseChordProFormat(chordProLinesArray) {
 						let word = {
 							word: theLyricWord,
 							x: 40 + theLyricLocationIndex * characterWidth,
-							y: 40 + i * 2 * 40 + 25
+							y: 40 + i * 2 * 40 + 25,
+							lyric: "lyric"
 						};
-						if (word.word.endsWith("]")) word.chord = "chord";
-						else word.lyric = "lyric";
 						words.push(word);
 					}
 					theLyricWord = "";
