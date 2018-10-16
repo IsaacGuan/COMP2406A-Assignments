@@ -93,6 +93,22 @@ http.createServer(function(request, response) {
 					}
 				});
 			}
+		} else if (request.method == "POST" && urlObj.pathname === "/saveSong") {
+			let songLines = dataObj.songLines;
+			let saveAsFileName = dataObj.saveAsFileName;
+			let saveAsFilePath = ROOT_SONG_DIR + "/" + saveAsFileName + ".txt";
+			let fileDataString = "";
+			for (let i = 0; i < songLines.length; i++) {
+				fileDataString += songLines[i];
+				if (i < songLines.length - 1) fileDataString += "\n";
+			}
+			fs.writeFile(saveAsFilePath, fileDataString, function(err, data) {
+				let returnObj = {};
+				returnObj.text = "Saved: " + saveAsFilePath;
+				response.writeHead(200, { "Content-Type": MIME_TYPES["json"] });
+				response.end(JSON.stringify(returnObj));
+				songFiles[saveAsFileName] = saveAsFilePath;
+			});
 		} else if (request.method == "POST") {
 			let returnObj = {};
 			returnObj.text = "UNKNOWN REQUEST";
