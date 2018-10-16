@@ -227,6 +227,31 @@ function handleSubmitButton() {
 	}
 }
 
+function handleSaveAsButton() {
+	console.log("Save As...");
+	let userText = $("#userTextField").val();
+
+	console.log("****song lines to save *****");
+	let textDiv = document.getElementById("text-area");
+	textDiv.innerHTML = "";
+	for (let i = 0; i < lines.length; i++) {
+		console.log(lines[i]);
+		textDiv.innerHTML = textDiv.innerHTML + `<p>${lines[i]}</p>`;
+	}
+	if (userText && userText !== "" && words.length > 0) {
+		let userRequestObj = { text: "save" };
+		let saveAsFileName = userText;
+		userRequestObj.saveAsFileName = saveAsFileName;
+
+		userRequestObj.songLines = lines;
+
+		let userRequestJSON = JSON.stringify(userRequestObj);
+		$("#userTextField").val("");
+
+		$.post("saveSong", userRequestJSON);
+	}
+}
+
 function transpose(semitones) {
 	if(semitones === 0) return;
 	for (let i = 0; i < words.length; i++) {
