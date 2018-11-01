@@ -4,8 +4,11 @@ let startX = 800;
 let startY = 600;
 let ball_radius = 15;
 
+let timer;
 let selectedBall;
 let deltaX, deltaY;
+let x_speed = 0;
+let y_speed = 0;
 
 let balls = [
 	{ name: `ball1`, x: startX + ball_radius, y: startY - ball_radius, x_speed: 0, y_speed: 0, direction: [0, 0], color: `red` },
@@ -73,8 +76,14 @@ function handleMouseDown(e) {
 }
 
 function handleMouseMove(e) {
+	let curr_x = selectedBall.x;
+	let curr_y = selectedBall.y;
+
 	selectedBall.x = e.pageX + deltaX;
 	selectedBall.y = e.pageY + deltaY;
+
+	x_speed = selectedBall.x - curr_x;
+	y_speed = selectedBall.y - curr_y;
 
 	e.stopPropagation();
 
@@ -82,6 +91,9 @@ function handleMouseMove(e) {
 }
 
 function handleMouseUp(e) {
+	selectedBall.x_speed = x_speed;
+	selectedBall.y_speed = y_speed;
+
 	e.stopPropagation();
 
 	$("#canvas1").off("mousemove", handleMouseMove);
@@ -90,7 +102,54 @@ function handleMouseUp(e) {
 	drawCanvas();
 }
 
+function updateBall(ball) {
+	ball.direction = getDirection(ball);
+
+	if (Math.abs(ball.y_speed) < 0.98) {
+		ball.y_speed = 0;
+	}
+	if (Math.abs(ball.x_speed) < 0.98) {
+		ball.x_speed = 0;
+	}
+
+	ball.y += ball.y_speed;
+	ball.y_speed *= 0.95;
+
+	ball.x += ball.x_speed;
+	ball.x_speed *= 0.95;
+
+	drawCanvas();
+}
+
+function getDirection(ball) {
+	let dirc = [];
+
+	if (ball.x_speed > 0) {
+		if (ball.y_speed > 0) {
+			dirc = [1, 1];
+		} else {
+			dirc = [1, -1];
+		}
+	} else {
+		if (ball.y_speed > 0) {
+			dirc = [-1, 1];
+		} else {
+			dirc = [-1, -1];
+		}
+	}
+
+	return dirc;
+}
+
+function handleTimer() {
+	for (ball of balls) {
+		updateBall(ball);
+	}
+}
+
 $(document).ready(function() {
 	$("#canvas1").mousedown(handleMouseDown);
 	drawCanvas();
+
+	timer = setInterval(handleTimer,30);
 });
