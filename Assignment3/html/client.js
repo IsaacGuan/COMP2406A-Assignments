@@ -103,6 +103,8 @@ function handleMouseUp(e) {
 }
 
 function updateBall(ball) {
+	hitBoundary(ball);
+
 	ball.direction = getDirection(ball);
 
 	if (Math.abs(ball.y_speed) < 0.98) {
@@ -139,6 +141,24 @@ function getDirection(ball) {
 	}
 
 	return dirc;
+}
+
+function hitBoundary(movingBall) {
+	if (movingBall.x < startX + ball_radius) {
+		movingBall.x_speed = 0;
+		movingBall.x = startX + ball_radius;
+	} else if (movingBall.x > startX + 200 - ball_radius) {
+		movingBall.x_speed = 0;
+		movingBall.x = startX + 200 - ball_radius;
+	}
+
+	if (movingBall.y < ball_radius ) {
+		movingBall.y_speed = 0;
+		movingBall.y = ball_radius;
+	} else if (movingBall.y > startY - ball_radius) {
+		movingBall.y_speed = 0;
+		movingBall.y = startY - ball_radius;
+	}
 }
 
 function handleTimer() {
