@@ -6,6 +6,7 @@ let ball_radius = 15;
 
 let timer;
 let selectedBall;
+let hit_ball;
 let deltaX, deltaY;
 let x_speed = 0;
 let y_speed = 0;
@@ -105,6 +106,17 @@ function handleMouseUp(e) {
 function updateBall(ball) {
 	hitBoundary(ball);
 
+	if (isCollision(ball)) {
+		let dist_to_hit_ball = (ball.x - hit_ball.x) * (ball.x - hit_ball.x) + (ball.y - hit_ball.y) * (ball.y - hit_ball.y);
+		if (Math.sqrt(dist_to_hit_ball) < 2 * ball_radius - 5) {
+			let apartSpeed = 1;
+			ball.x_speed += ball.direction[0] * apartSpeed;
+			ball.y_speed += ball.direction[1] * apartSpeed;
+			hit_ball.x_speed += hit_ball.direction[0] * apartSpeed;
+			hit_ball.y_speed += hit_ball.direction[1] * apartSpeed;
+		}
+	}
+
 	ball.direction = getDirection(ball);
 
 	if (Math.abs(ball.y_speed) < 0.98) {
@@ -158,6 +170,86 @@ function hitBoundary(movingBall) {
 	} else if (movingBall.y > startY - ball_radius) {
 		movingBall.y_speed = 0;
 		movingBall.y = startY - ball_radius;
+	}
+}
+
+function ballCollision(ball1, ball2) {
+	let dx = Math.abs(ball1.x - ball2.x);
+	let dy = Math.abs(ball1.y - ball2.y);
+	let ball1_v = Math.sqrt(ball1.x_speed * ball1.x_speed + ball1.y_speed * ball1.y_speed);
+
+	if (ball1_v === 0) {
+		ball1_v += 1e-12;
+	}
+
+	let dist = Math.sqrt(dx * dx + dy * dy);
+
+	if (dist == 0) {
+		return;
+	}
+
+	let angle_b = Math.asin(dy / dist);
+	let angle_d = Math.asin(Math.abs(ball1.x_speed) / ball1_v);
+	let angle_a = (Math.PI / 2) - angle_b - angle_d;
+	let angle_c = angle_b - angle_a;
+
+	let v1 = ball1_v * Math.abs(Math.sin(angle_a));
+	let v2 = ball1_v * Math.abs(Math.cos(angle_a));
+
+	let v1x = v1 * Math.abs(Math.cos(angle_c));
+	let v1y = v1 * Math.abs(Math.sin(angle_c));
+	let v2x = v2 * Math.abs(Math.cos(angle_b));
+	let v2y = v2 * Math.abs(Math.sin(angle_b));
+
+	if (ball1.x_speed > 0) {
+		if (ball1.x < ball2.x) {
+			v1x = -v1x;
+		} else {
+			v2x = -v2x;
+		}
+	} else {
+		if (ball1.x > ball2.x) {
+			v2x = -v2x;
+		} else {
+			v1x = -v1x;
+		}
+	}
+
+	if (ball1.y_speed > 0) {
+		if (ball1.y < ball2.y) {
+			v1y = -v1y;
+		} else {
+			v2y = -v2y;
+		}
+	} else {
+		if (ball1.y > ball2.y) {
+			v2y = -v2y;
+		} else {
+			v1y = -v1y;
+		}
+	}
+
+	ball1.x_speed = v1x;
+	ball1.y_speed = v1y;
+	ball2.x_speed = v2x;
+	ball2.y_speed = v2y;
+
+	return;
+}
+
+function isCollision(movingBall) {
+	for (ball of balls) {
+		if (ball.x_speed !== 0 || ball.y_speed !== 0) {
+			continue;
+		}
+
+		let dist = (movingBall.x - ball.x) * (movingBall.x - ball.x) + (movingBall.y - ball.y) * (movingBall.y - ball.y);
+
+		if (dist > 0 && Math.sqrt(dist) < 2 * ball_radius - 5) {
+			hit_ball = ball;
+			ballCollision(movingBall, hit_ball);
+			return true;
+		}
 	}
 }
 
