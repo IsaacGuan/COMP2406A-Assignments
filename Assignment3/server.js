@@ -1,4 +1,5 @@
 let server = require("http").createServer(handler);
+let io = require("socket.io")(server);
 let fs = require("fs");
 let url = require("url");
 
@@ -63,5 +64,24 @@ function handler(request, response) {
 }
 
 server.listen(3000);
+
+let clientNumber = 0;
+
+io.on("connection", function(socket) {
+	clientNumber = Object.keys(io.sockets.connected).length;
+	console.log("player number : " + clientNumber);
+	socket.join("playground");
+
+	if (clientNumber > 2) {
+		socket.leave("playground", function() {
+			console.log("you are leaving");
+		});
+	} else {
+		socket.on("updateBall", function(data) {
+			console.log(data);
+			io.emit("updateBall",data);
+		});
+	}
+});
 
 console.log("Server Running at http://localhost:3000/ CNTL-C to quit");
