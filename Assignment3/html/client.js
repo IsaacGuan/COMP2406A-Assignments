@@ -11,6 +11,8 @@ let deltaX, deltaY;
 let x_speed = 0;
 let y_speed = 0;
 
+let socket = io("http://" + window.document.location.host);
+
 let balls = [
 	{ name: `ball1`, x: startX + ball_radius, y: startY - ball_radius, x_speed: 0, y_speed: 0, direction: [0, 0], color: `red` },
 	{ name: `ball2`, x: startX + 45, y: startY - ball_radius, x_speed: 0, y_speed: 0, direction: [0, 0], color: `red` },
@@ -255,9 +257,27 @@ function isCollision(movingBall) {
 
 function handleTimer() {
 	for (ball of balls) {
+		if (ball.x_speed !== 0 || ball.y_speed !== 0) {
+			socket.emit("updateBall", JSON.stringify(ball));
+		}
+
 		updateBall(ball);
 	}
 }
+
+socket.on("updateBall", function(data) {
+	console.log(`received data: ${data}`);
+	let dataObj = JSON.parse(data);
+
+	for (ball of balls) {
+		if (dataObj.name === ball.name) {
+			ball.x = dataObj.x;
+			ball.y = dataObj.y;
+
+			updateBall(ball);
+		}
+	}
+});
 
 $(document).ready(function() {
 	$("#canvas1").mousedown(handleMouseDown);
