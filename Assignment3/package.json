@@ -1,15 +1,16 @@
 {
-  "name": "Assignment3",
+  "name": "assignment3",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "Yanran Guan <yanranguan@gmail.com> (https://isaacguan.github.io/)",
-  "license": "MIT",
+  "description": "Assignment 3 of COMP2406A, Fall 2018",
+  "main": "server.js",
   "dependencies": {
     "socket.io": "^2.1.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "author": "Yanran Guan <yanranguan@gmail.com> (https://isaacguan.github.io/)",
+  "license": "MIT"
 }
