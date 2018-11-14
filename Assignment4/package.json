@@ -1,0 +1,16 @@
+{
+  "name": "assignment4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "author": "Yanran Guan <yanranguan@gmail.com> (https://isaacguan.github.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}
