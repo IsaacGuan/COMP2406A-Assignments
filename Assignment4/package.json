@@ -1,16 +1,17 @@
 {
   "name": "assignment4",
   "version": "1.0.0",
-  "description": "",
+  "description": "Assignment 4 of COMP2406A, Fall 2018",
   "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "node server.js",
     "start": "node server.js"
   },
   "author": "Yanran Guan <yanranguan@gmail.com> (https://isaacguan.github.io/)",
-  "license": "MIT",
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "express": "^4.16.2"
-  }
+  "license": "MIT"
 }
